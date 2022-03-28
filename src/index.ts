@@ -1,21 +1,12 @@
 import 'reflect-metadata';
 import { buildSchema } from 'type-graphql';
 import { ApolloServer } from 'apollo-server';
-import { createConnection } from 'typeorm';
 
+import { connectDb } from './utils/db';
 import { OpinionResolver } from './resolvers/OpinionResolver';
 
 const app = async () => {
-  await createConnection({
-    type: 'postgres',
-    host: 'db',
-    username: 'docker',
-    password: 'secret',
-    database: 'docker',
-    synchronize: true,
-    connectTimeoutMS: 10000,
-    entities: ['build/entities/*.js'],
-  });
+  await connectDb();
 
   const schema = await buildSchema({
     resolvers: [OpinionResolver],

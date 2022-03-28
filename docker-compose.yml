@@ -1,6 +1,15 @@
 version: '3.9'
 
 services:
+  db:
+    container_name: 'db'
+    image: 'postgres'
+    environment:
+      POSTGRES_PASSWORD: 'docker'
+      POSTGRES_USER: 'docker'
+      POSTGRES_DB: 'pokkne-api'
+    volumes:
+      - 'data:/var/lib/postgresql/data'
   server:
     container_name: 'server'
     build: .
@@ -8,14 +17,6 @@ services:
       - '4000:4000'
     depends_on:
       - 'db'
-  db:
-    container_name: 'db'
-    image: 'postgres'
-    environment:
-      POSTGRES_PASSWORD: 'secret'
-      POSTGRES_USER: 'docker'
-    volumes:
-      - 'data:/var/lib/postgresql/data'
-  
+
 volumes:
   data:
