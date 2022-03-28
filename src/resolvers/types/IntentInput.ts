@@ -1,4 +1,5 @@
 import { Field, InputType } from 'type-graphql';
+
 import { Intent } from '../../entities/Intent';
 
 @InputType()
