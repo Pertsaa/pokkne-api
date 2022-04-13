@@ -10,6 +10,8 @@ services:
       POSTGRES_DB: 'pokkne-api'
     volumes:
       - 'data:/var/lib/postgresql/data'
+    networks:
+      - default
   server:
     container_name: 'server'
     build: .
@@ -17,6 +19,12 @@ services:
       - '4000:4000'
     depends_on:
       - 'db'
+    networks:
+      - default
 
 volumes:
   data:
+
+networks:
+  default: 
+    name: 'pokkne_network'
