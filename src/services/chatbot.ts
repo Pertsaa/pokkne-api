@@ -26,7 +26,7 @@ const renameChatbot = async (id: number, newName: string): Promise<Chatbot> => {
 };
 
 const addIntentToChatbot = async (intentId: number, chatbotId: number): Promise<Chatbot> => {
-  const chatbot = await Chatbot.findOne({ id: chatbotId });
+  const chatbot = await Chatbot.findOne({ id: chatbotId }, { relations: ['intents'] });
   if (!chatbot) throw Error(`No chatbot with id: ${chatbotId}`);
   const intent = await Intent.findOne({ id: intentId });
   if (!intent) throw Error(`No intent with id: ${intentId}`);
@@ -36,7 +36,7 @@ const addIntentToChatbot = async (intentId: number, chatbotId: number): Promise<
 };
 
 const removeIntentFromChatbot = async (intentId: number, chatbotId: number): Promise<Chatbot> => {
-  const chatbot = await Chatbot.findOne({ id: chatbotId });
+  const chatbot = await Chatbot.findOne({ id: chatbotId }, { relations: ['intents'] });
   if (!chatbot) throw Error(`No chatbot with id: ${chatbotId}`);
   const intent = await Intent.findOne({ id: intentId });
   if (!intent) throw Error(`No intent with id: ${intentId}`);
