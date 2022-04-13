@@ -2,6 +2,7 @@ import { Arg, ID, Mutation, Query, Resolver } from 'type-graphql';
 
 import { Chatbot } from '../entities/Chatbot';
 import { ChatbotInput } from './types/ChatbotInput';
+import { MathIntentResponse } from './types/MatchIntentResponse';
 import chatbotService from '../services/chatbot';
 
 @Resolver(() => Chatbot)
@@ -9,6 +10,14 @@ export class ChatbotResolver {
   @Query(() => [Chatbot])
   async chatbots(): Promise<Chatbot[]> {
     return await chatbotService.getChatbots();
+  }
+
+  @Query(() => MathIntentResponse)
+  async matchIntent(
+    @Arg('chatbotId', () => ID) chatbotId: number,
+    @Arg('query') query: string,
+  ): Promise<MathIntentResponse> {
+    return await chatbotService.matchIntentToQuery(chatbotId, query);
   }
 
   @Mutation(() => Chatbot)

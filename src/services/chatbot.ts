@@ -1,6 +1,8 @@
 import { Chatbot } from '../entities/Chatbot';
 import { Intent } from '../entities/Intent';
 import { ChatbotInput } from '../resolvers/types/ChatbotInput';
+import { randomEntry, sentenceSimilarity } from '../utils/math';
+import { MatchIntentResponse } from '../types';
 
 const getChatbots = async (): Promise<Chatbot[]> => {
   const chatbots = await Chatbot.find({ relations: ['intents'] });
@@ -45,4 +47,33 @@ const removeIntentFromChatbot = async (intentId: number, chatbotId: number): Pro
   return await chatbot.save();
 };
 
-export default { getChatbots, addChatbot, removeChatbot, renameChatbot, addIntentToChatbot, removeIntentFromChatbot };
+const matchIntentToQuery = async (chatbotId: number, query: string): Promise<MatchIntentResponse> => {
+  const chatbot = await Chatbot.findOne({ id: chatbotId }, { relations: ['intents'] });
+  if (!chatbot) throw Error(`No chatbot with id: ${chatbotId}`);
+
+  let bestSimilarity = 0;
+  let bestIntent: Intent | undefined;
+  for (const intent of chatbot.intents) {
+    for (const example of intent.examples) {
+      const similarity = sentenceSimilarity(query, example);
+      if (similarity > bestSimilarity) {
+        bestIntent = intent;
+        bestSimilarity = similarity;
+      }
+    }
+  }
+
+  if (!bestIntent) return { intent: 'FALLBACK' };
+
+  return { intent: bestIntent.name, response: randomEntry(bestIntent.responses) };
+};
+
+export default {
+  getChatbots,
+  addChatbot,
+  removeChatbot,
+  renameChatbot,
+  addIntentToChatbot,
+  removeIntentFromChatbot,
+  matchIntentToQuery,
+};
