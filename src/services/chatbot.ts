@@ -41,7 +41,7 @@ const removeIntentFromChatbot = async (intentId: number, chatbotId: number): Pro
   const intent = await Intent.findOne({ id: intentId });
   if (!intent) throw Error(`No intent with id: ${intentId}`);
 
-  chatbot.intents = chatbot.intents.filter((i) => i.id !== intentId);
+  chatbot.intents = chatbot.intents.filter((i) => i.id !== intent.id);
   return await chatbot.save();
 };
 
