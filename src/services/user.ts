@@ -1,4 +1,6 @@
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import config from '../config';
 
 import { User } from '../entities/User';
 import { UserInput } from '../resolvers/types/UserInput';
@@ -16,8 +18,19 @@ const addUser = async ({ username, password }: UserInput): Promise<User> => {
 
 const removeUser = async (id: number): Promise<boolean> => {
   const user = await User.findOne({ id });
-  if (user) await user.remove();
+  if (!user) return true;
+  if (user.username === config.ROOT_USERNAME) return false;
+  await user.remove();
   return true;
 };
 
-export default { getUsers, addUser, removeUser };
+const login = async ({ username, password }: UserInput) => {
+  const user = await User.findOne({ username });
+  if (!user) throw Error('Invalid username or password');
+  if (!bcrypt.compare(password, user.passwordHash)) throw Error('Invalid username or password');
+
+  const accessToken = jwt.sign({ userId: user.id }, config.JWT_SECRET, { expiresIn: '30m' });
+  return { accessToken };
+};
+
+export default { getUsers, addUser, removeUser, login };
