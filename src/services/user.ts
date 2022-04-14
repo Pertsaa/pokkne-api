@@ -27,8 +27,8 @@ const removeUser = async (id: number): Promise<boolean> => {
 const login = async ({ username, password }: UserInput) => {
   const user = await User.findOne({ username });
   if (!user) throw Error('Invalid username or password');
-  if (!bcrypt.compare(password, user.passwordHash)) throw Error('Invalid username or password');
-
+  const match = await bcrypt.compare(password, user.passwordHash);
+  if (!match) throw Error('Invalid username or password');
   const accessToken = jwt.sign({ userId: user.id }, config.JWT_SECRET, { expiresIn: '30m' });
   return { accessToken };
 };
